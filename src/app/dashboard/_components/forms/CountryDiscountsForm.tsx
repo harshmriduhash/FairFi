@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -8,65 +8,65 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { productCountryDiscountsSchema } from "@/schemas/product"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import Image from "next/image"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
-import { updateCountryDiscounts } from "@/server/actions/products"
+} from "@/components/ui/form";
+import { productCountryDiscountsSchema } from "@/schemas/product";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import Image from "next/image";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { updateCountryDiscounts } from "@/server/actions/products";
 
 export function CountryDiscountsForm({
   productId,
   countryGroups,
 }: {
-  productId: string
+  productId: string;
   countryGroups: {
-    id: string
-    name: string
-    recommendedDiscountPercentage: number | null
+    id: string;
+    name: string;
+    recommendedDiscountPercentage: number | null;
     countries: {
-      name: string
-      code: string
-    }[]
+      name: string;
+      code: string;
+    }[];
     discount?: {
-      coupon: string
-      discountPercentage: number
-    }
-  }[]
+      coupon: string;
+      discountPercentage: number;
+    };
+  }[];
 }) {
-  const { toast } = useToast()
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof productCountryDiscountsSchema>>({
     resolver: zodResolver(productCountryDiscountsSchema),
     defaultValues: {
-      groups: countryGroups.map(group => {
+      groups: countryGroups.map((group) => {
         const discount =
           group.discount?.discountPercentage ??
-          group.recommendedDiscountPercentage
+          group.recommendedDiscountPercentage;
 
         return {
           countryGroupId: group.id,
           coupon: group.discount?.coupon ?? "",
           discountPercentage: discount != null ? discount * 100 : undefined,
-        }
+        };
       }),
     },
-  })
+  });
 
   async function onSubmit(
     values: z.infer<typeof productCountryDiscountsSchema>
   ) {
-    const data = await updateCountryDiscounts(productId, values)
+    const data = await updateCountryDiscounts(productId, values);
 
     if (data.message) {
       toast({
         title: data.error ? "Error" : "Success",
         description: data.message,
         variant: data.error ? "destructive" : "default",
-      })
+      });
     }
   }
 
@@ -84,7 +84,7 @@ export function CountryDiscountsForm({
                   {group.name}
                 </h2>
                 <div className="flex gap-2 flex-wrap">
-                  {group.countries.map(country => (
+                  {group.countries.map((country) => (
                     <Image
                       key={country.code}
                       width={24}
@@ -115,7 +115,7 @@ export function CountryDiscountsForm({
                             {...field}
                             type="number"
                             value={field.value ?? ""}
-                            onChange={e =>
+                            onChange={(e) =>
                               field.onChange(e.target.valueAsNumber)
                             }
                             min="0"
@@ -155,5 +155,5 @@ export function CountryDiscountsForm({
         </div>
       </form>
     </Form>
-  )
+  );
 }
